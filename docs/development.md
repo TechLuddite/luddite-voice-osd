@@ -200,3 +200,11 @@ notice. The installed OSD/microphone source matches Omarchy v4.0.5 at
 Publication is a development preview, separate from marketplace listing or
 physical dictation acceptance. The earlier unpublished status above describes
 the original extraction checkpoint.
+
+
+Initial public CI at `90943ae` passed all 46 checks and the marketplace baseline
+(outcome `passed`, no findings or capabilities). Scout flagged the new
+repository's missing security policy and disabled private vulnerability reports.
+Added the same SECURITY.md used by Jeans Instability, with this repository's
+private advisory URL, and enabled GitHub private vulnerability reporting. The
+informational missing-preview-image note does not block CI. No gate was relaxed.
