@@ -20,6 +20,12 @@ with a moving processing indicator and its own elapsed time. Cancel discards the
 transcription. Idle hides the window. Keyboard focus stays in the app receiving
 your dictation.
 
+A known EasyEffects integration issue can leave audio flowing while its virtual
+source reports mute. The current red icon and empty meter reflect that flag and
+are not proof that capture is silent. The
+[separate mute investigation](docs/microphone-mute-investigation.md) records the
+evidence and follow-up work.
+
 This is the compact popup extracted from the
 [Odin 2 Portal project](https://github.com/TechLuddite/omarchy-mobile-odin2/blob/main/docs/direct-dictation.md).
 It works without that project's controller, hardware broker, UI bridge or larger
@@ -29,18 +35,19 @@ Voice command panel.
 
 Version 0.1.0 is a development preview published as
 [TechLuddite/luddite-voice-osd](https://github.com/TechLuddite/luddite-voice-osd).
-It is not listed in the marketplace and has not passed physical installation/
-dictation acceptance. See
-[development and acceptance](docs/development.md) for evidence and remaining checks.
+It is not listed in the marketplace. Installation from this repo, ordinary
+dictation and a repeat test with another theme have been confirmed on one
+Omarchy x86-64 desktop with Voxtype 1.1.1. See
+[development and acceptance](docs/development.md) for the remaining checks.
 
 ## Requirements
 
 - Omarchy Quattro with the Quickshell shell and its current `Commons`/`Ui` kit.
 - Python 3.10 or newer; only the standard library is used.
 - An already configured Voxtype daemon providing `$XDG_RUNTIME_DIR/voxtype/state`
-  and `audio.sock`. The protocol is based on Voxtype 1.1.0; other releases need
-  confirmation. Use the normal runtime paths; custom state/socket paths are
-  currently unsupported.
+  and `audio.sock`. The protocol is based on Voxtype 1.1.0, with basic desktop
+  dictation also tested on 1.1.1; other releases need confirmation. Use the
+  normal runtime paths; custom state/socket paths are currently unsupported.
 
 Voxtype owns capture, the model, transcription and insertion. Set it up and
 check its ordinary dictation flow first. This plugin installs no speech models,

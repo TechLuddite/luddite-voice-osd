@@ -208,3 +208,28 @@ repository's missing security policy and disabled private vulnerability reports.
 Added the same SECURITY.md used by Jeans Instability, with this repository's
 private advisory URL, and enabled GitHub private vulnerability reporting. The
 informational missing-preview-image note does not block CI. No gate was relaxed.
+
+
+## October 19, 2026 — installation and user dictation tests
+
+Installed the public repository at `df1c6dd` through `omarchy plugin add --enable`.
+The observer connected to the existing Voxtype 1.1.1 daemon and reported idle,
+with no pending action or error. Backed up shell/Voxtype configuration locally,
+set only `osd.enabled` to false and restarted Voxtype while idle to select the
+new popup. Existing recording shortcuts were retained.
+
+The user successfully dictated a message and repeated the basic test with a
+different theme, then indicated readiness to proceed with the OSD work. This is
+basic installation, dictation and theme-switch acceptance on one x86-64 desktop.
+It does not establish the remaining ARM, headset, physical focus, or shell
+teardown cases. Hosted CI at `df1c6dd` passed all 46 checks, Scout and the
+marketplace baseline in
+[run 39237128331](https://github.com/TechLuddite/luddite-voice-osd/actions/runs/39237128331).
+
+During testing, dictation continued with the EasyEffects virtual source marked
+muted. The live graph confirmed that the mute flag stayed set while that source
+fed Voxtype. The separate
+[microphone mute investigation](microphone-mute-investigation.md) records the
+confirmed behavior, likely explanation, OSD indicator limitation and follow-up
+checks. No audio-routing fix or OSD workaround was applied. The user requested
+that this topic remain tracked separately while the OSD work proceeds.
