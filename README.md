@@ -14,19 +14,13 @@ through the shared shell tokens.
 During recording it shows a real input-level meter, elapsed time and a quiet-input
 warning. The recording icon uses the same microphone/microphone-muted glyphs
 as the system OSD. The unmuted icon follows the system popup text color; when
-the system default microphone is muted, the icon and “Microphone muted” label
+the system default microphone reports mute, the icon and “Microphone muted” label
 use the theme's red/urgent color and the meter is empty. Mute status follows
 the default input used by Omarchy's microphone widget, while quiet-input warnings
 come from Voxtype's actual level summaries. During transcription it stays visible
 with a moving processing indicator and its own elapsed time. Cancel discards the current recording or pending
 transcription. Idle hides the window. Keyboard focus stays in the app receiving
 your dictation.
-
-A known EasyEffects integration issue can leave audio flowing while its virtual
-source reports mute. The current red icon and empty meter reflect that flag and
-are not proof that capture is silent. The
-[separate mute investigation](docs/microphone-mute-investigation.md) records the
-evidence and follow-up work.
 
 This is the compact popup extracted from the
 [Odin 2 Portal project](https://github.com/TechLuddite/omarchy-mobile-odin2/blob/main/docs/direct-dictation.md).

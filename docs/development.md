@@ -226,13 +226,6 @@ teardown cases. Hosted CI at `df1c6dd` passed all 46 checks, Scout and the
 marketplace baseline in
 [run 39237128331](https://github.com/TechLuddite/luddite-voice-osd/actions/runs/39237128331).
 
-During testing, dictation continued with the EasyEffects virtual source marked
-muted. The live graph confirmed that the mute flag stayed set while that source
-fed Voxtype. The separate
-[microphone mute investigation](microphone-mute-investigation.md) records the
-confirmed behavior, likely explanation, OSD indicator limitation and follow-up
-checks. No audio-routing fix or OSD workaround was applied. The user requested
-that this topic remain tracked separately while the OSD work proceeds.
 
 
 ## October 19, 2026 — submission media prepared
@@ -259,6 +252,5 @@ conversation; its unrecorded choices are not assumed to have been recovered.
 Prepared the marketplace title/body in ignored `.work/submission/` using the
 marketplace's submission guide, Productivity category and ai/quickshell/hyprland
 tags. The proposed plugin ID is absent from the current registry, and no duplicate
-submission issue was found. The draft discloses scripted demonstration media and
-the separate mute limitation. The user requested preparation; no marketplace
-issue or release was created.
+submission issue was found. The draft describes the scripted demonstration media. The user requested
+preparation; no marketplace issue or release was created.

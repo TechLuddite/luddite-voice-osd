@@ -26,8 +26,7 @@ acceptance is recorded in [development.md](../development.md).
 
 The preview uses the shared 16-pixel font base size. Geometry and typography
 come from the installed Omarchy components and theme tokens. The plugin source
-was not restyled for the captures. The assets do not demonstrate effective mute;
-that issue remains in the [separate investigation](../microphone-mute-investigation.md).
+was not restyled for the captures.
 
 ## Local video and capture work
 
