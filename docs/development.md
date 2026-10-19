@@ -271,3 +271,17 @@ The capture remains isolated, with no Infomarchy, bar or personal windows.
 The matching wallpaper sources are credited in the media documentation. Earlier
 plain-background assets remain archived locally. No plugin code, desktop theme,
 audio configuration or runtime behavior changed for this media update.
+
+
+## October 19, 2026 — laptop installation observation
+
+After installing on a laptop, the user reported simultaneous stock and Luddite
+Voice OSD pickup popups. This observation preceded the latest Omarchy update and
+reboot; the user plans to complete both and retest. The post-update result is
+pending, and no cause has been confirmed.
+
+The laptop's Omarchy/Voxtype versions, stock frontend and `osd.enabled` setting
+have not been checked. The plugin leaves Voxtype's OSD preference unchanged;
+if the stock popup is Voxtype's built-in OSD and it remains enabled, both can
+appear, as documented in the README installation steps. An update or reboot
+has not been established as a fix.
