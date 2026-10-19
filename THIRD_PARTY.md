@@ -55,3 +55,9 @@ TechLuddite's [Luddite PXE Dust](https://github.com/TechLuddite/luddite-pxe-dust
 [Omarchy plugin marketplace](https://github.com/omacom/omarchy-plugin-marketplace)
 provide the external CI scanners. Their source is fetched at pinned commits in
 CI rather than bundled into this plugin.
+
+
+Preview screenshots and animations include the matching Hackerman, Catppuccin
+Latte and Gruvbox wallpapers supplied with Omarchy 4.0.5. Their source files are
+linked in [the media credits](docs/media/README.md#wallpaper-sources). Full
+wallpaper files are not bundled as standalone plugin assets.

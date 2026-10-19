@@ -41,7 +41,8 @@ Omarchy x86-64 desktop with Voxtype 1.1.1. See
 ![Animated recording, processing, dismissal and theme changes](docs/media/demo.gif)
 
 The animation shows the real plugin UI with scripted input levels and phases
-on a clean desktop. [More theme examples and media details](docs/media/README.md).
+on a clean desktop with matching Omarchy wallpapers.
+[More theme examples and media details](docs/media/README.md).
 
 ## Requirements
 

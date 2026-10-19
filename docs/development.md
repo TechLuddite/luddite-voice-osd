@@ -254,3 +254,20 @@ marketplace's submission guide, Productivity category and ai/quickshell/hyprland
 tags. The proposed plugin ID is absent from the current registry, and no duplicate
 submission issue was found. The draft describes the scripted demonstration media. The user requested
 preparation; no marketplace issue or release was created.
+
+
+## October 19, 2026 — matching theme wallpapers in preview media
+
+Replaced the original plain-gradient media with captures using the installed
+Omarchy wallpaper for each demonstrated theme: Hackerman's synth landscape,
+Catppuccin Latte's color fade, and Gruvbox's The Backwater. The background and
+popup theme now switch together in the same frame. Each wallpaper is checked as
+loaded before taking static captures, and the full demo is rendered with the
+same 22-second timing and 640-by-240 animation crop as before.
+
+Regenerated all stills, the looping GIF/WebP and both MP4 exports. Reviewed a
+contact sheet spanning recording, processing, idle and each theme transition.
+The capture remains isolated, with no Infomarchy, bar or personal windows.
+The matching wallpaper sources are credited in the media documentation. Earlier
+plain-background assets remain archived locally. No plugin code, desktop theme,
+audio configuration or runtime behavior changed for this media update.
