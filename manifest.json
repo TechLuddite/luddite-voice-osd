@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "id": "io.github.techluddite.voice-osd",
+  "name": "Luddite Voice OSD",
+  "version": "0.1.0",
+  "author": "TechLuddite",
+  "license": "MIT",
+  "description": "Compact, Omarchy-themed recording and processing windows for local Voxtype dictation.",
+  "kinds": ["service"],
+  "entryPoints": {"service": "Service.qml"}
+}
