@@ -1,7 +1,7 @@
 # Luddite Voice OSD preview media
 
-These assets show the actual `Dictation.qml` component from the development
-preview on a clean private Wayland desktop. The capture includes no Infomarchy,
+These assets show the actual `Dictation.qml` component on a clean private
+Wayland desktop. The capture includes no Infomarchy,
 bar or personal windows. The desktop uses each theme's matching wallpaper from
 the installed Omarchy 4.0.5 package. Popup colors and wallpaper switch together
 through Hackerman, Catppuccin Latte and Gruvbox.

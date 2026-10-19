@@ -27,14 +27,17 @@ This is the compact popup extracted from the
 It works without that project's controller, hardware broker, UI bridge or larger
 Voice command panel.
 
-## Development preview
+## Release status
 
-Version 0.1.1 is a development preview published as
+Version 0.1.1 is available from
 [TechLuddite/luddite-voice-osd](https://github.com/TechLuddite/luddite-voice-osd).
-It is not listed in the marketplace. Installation from this repo, ordinary
-dictation and a repeat test with another theme have been confirmed on one
-Omarchy x86-64 desktop with Voxtype 1.1.1. See
-[development and acceptance](docs/development.md) for the remaining checks.
+The user has confirmed it working on both an Omarchy desktop and laptop after
+updating, including the corrected single-popup setup. The desktop was tested
+with Omarchy 4.0.5 and Voxtype 1.1.1; the laptop's exact versions were not
+collected. Theme switching has also been tested on the desktop. Marketplace
+submission is being prepared. See [development and acceptance](docs/development.md)
+for the test scope and remaining hardware-specific checks, and
+[the changelog](CHANGELOG.md) for version history.
 
 ## Preview and demo
 
@@ -59,8 +62,7 @@ changes no audio settings and starts no recording when enabled.
 
 ## Installation
 
-Use a disposable checkout/session for evaluation until physical acceptance is
-complete. The normal Omarchy plugin command can clone and enable the plugin:
+Install and enable the plugin using Omarchy's plugin command, with dictation idle:
 
 ```sh
 omarchy plugin add https://github.com/TechLuddite/luddite-voice-osd --enable
@@ -116,6 +118,25 @@ For older releases without the config command, set `[osd] enabled = false` in
 restart procedure while idle. The plugin rechecks for this manual fix. A previous
 Portal installation has its own `voxtype-osd` shim and managed files: migrate it
 separately using its recovery record, rather than enabling two frontends.
+
+## Updating
+
+Finish any active dictation, then run:
+
+```sh
+omarchy plugin update io.github.techluddite.voice-osd
+```
+
+Review and confirm the update when prompted. The shell reloads the plugin;
+no reboot is needed. Give the observer a few seconds to connect, then check:
+
+```sh
+omarchy-shell luddite-voice-osd status
+```
+
+`connected: true` and `osd_setup: ready` indicate that the popup is ready.
+Existing Voxtype recording shortcuts continue to work. The update to 0.1.1
+handles selection of this popup automatically on standard installations.
 
 ## Controls
 

@@ -1,5 +1,11 @@
 # October 18, 2026 — standalone extraction
 
+Current acceptance: on October 19 the user confirmed version 0.1.1 working on
+both the desktop and laptop after the update instructions, including the
+corrected single-popup experience. Earlier entries below record historical
+checkpoints; the two-system acceptance and publication preparation entry at the
+end supersedes the earlier pending laptop retest.
+
 Requested scope: ship the theme-adherent recording/processing windows as their
 own Omarchy plugin, initially named Luddite Voice Windows and later renamed
 Luddite Voice OSD, in `~/Projects/Luddite-Voice-OSD`.
@@ -281,7 +287,7 @@ reboot; the user plans to complete both and retest. The post-update result is
 pending, and no cause has been confirmed.
 
 The laptop's Omarchy/Voxtype versions, stock frontend and `osd.enabled` setting
-have not been checked. The plugin leaves Voxtype's OSD preference unchanged;
+were not checked at this checkpoint. Version 0.1.0 left Voxtype's OSD preference unchanged;
 if the stock popup is Voxtype's built-in OSD and it remains enabled, both can
 appear, as documented in the README installation steps. An update or reboot
 has not been established as a fix.
@@ -305,7 +311,8 @@ A private recovery receipt survives interrupted writes, restarts or cleanup;
 `backend.py --restore-osd` can finish recovery while the plugin is disabled.
 Unsupported/custom setups get a manual-setup notification, with our popup hidden
 until ready. Pending setup does not cancel recordings handled by the stock UI.
-The laptop's post-update/reboot result remains unconfirmed.
+The laptop retest was still pending at this implementation checkpoint; the
+subsequent user confirmation is recorded below.
 
 The expanded private QML teardown test initially exposed Quickshell's immediate
 termination of its direct Process child on object destruction. The service now
@@ -338,3 +345,30 @@ capability with Voxtype-scoped evidence in the README/backend, rejecting every
 finding and unexpected capability. The raw classification remains visible in
 logs/summaries and in the submission draft; marketplace human review remains
 required. Scanner pins and rules are unchanged.
+
+
+## October 19, 2026 — two-system acceptance and publication preparation
+
+After following the 0.1.1 update instructions, the user confirmed the plugin
+working on both the desktop and laptop. This closes the reported duplicate
+pickup-popup installation observation. The fix is the plugin's automatic
+selection of the replacement popup; an Omarchy update/reboot is not separately
+established as the cause or cure. The desktop's recorded versions are Omarchy
+4.0.5 and Voxtype 1.1.1. The laptop's exact versions and architecture were not
+collected. Do not extend this acceptance to native ARM, headset-specific input,
+or physical teardown/recovery cases that have not been reported tested.
+
+Updated the README's release status, normal installation wording and update
+instructions to reflect this evidence. Refreshed the marketplace issue draft
+and prepared release notes/video assets locally. The declared service capability
+and remaining marketplace maintainer review are retained in the submission.
+No marketplace issue or public release is created by this preparation step.
+
+Publication preflight uses the marketplace's current source at
+`572279ba603c88de2193dd9b0f5dfc9c1089fdf6`, alongside this repository's pinned
+CI scanners. Check the exact final pushed commit with its issue-format parser,
+public-repository/Quattro validator, preview processor, registry/retired-ID
+checks and static security baseline. Reports, the exact commit identity and
+release/submission drafts are retained under ignored `.work/publishing/`,
+`.work/release/` and `.work/submission/`. Final approval remains separate from
+the owner's reported runtime acceptance.
