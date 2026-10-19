@@ -22,8 +22,11 @@ def main():
     parser.add_argument('--output-scale', type=float, default=1, help='Private output scale, e.g. 1.5 or 2')
     parser.add_argument('--output-width', type=int, default=1280, help='Private output width in physical pixels')
     parser.add_argument('--backend', action='store_true', help='Exercise the real observer with a fake Voxtype executable')
+    parser.add_argument('--osd-switch', action='store_true', help='With --backend, test OSD preference restoration on actual QML destruction')
     parser.add_argument('--artifacts', type=Path, help='Optional destination for synthetic popup images')
     args = parser.parse_args()
+    if args.osd_switch and not args.backend:
+        parser.error('--osd-switch requires --backend')
     with tempfile.TemporaryDirectory(prefix='voice-osd-qml-') as temporary:
         directory = Path(temporary)
         for name in ('Commons', 'Ui', 'services'):
@@ -230,10 +233,51 @@ ShellRoot {
             bins.mkdir()
             (runtime / 'voxtype').mkdir()
             (runtime / 'voxtype/state').write_text('idle')
+            voxtype_config = home / '.config/voxtype/config.toml'
+            voxtype_config.parent.mkdir(parents=True, exist_ok=True)
+            voxtype_config.write_text('# fixture config\n' if args.osd_switch else '[osd]\nenabled = false\n')
+            if args.osd_switch:
+                # Keep the actual observer and preference lifecycle. Replace
+                # only service identity/restart calls in this private fixture.
+                (directory / 'plugin').unlink()
+                (directory / 'plugin').mkdir()
+                for name in ('Service.qml', 'Dictation.qml', 'Label.qml'):
+                    shutil.copyfile(ROOT / name, directory / 'plugin' / name)
+                (directory / 'plugin/backend.py').write_text('''
+import os, pathlib, runpy
+namespace = runpy.run_path(''' + repr(str(ROOT / 'backend.py')) + ''')
+lease = namespace['OsdPreference']
+original_run = lease.run
+def run(command, capture=False):
+    if command[0] == '/usr/bin/systemctl':
+        assert command == ['/usr/bin/systemctl', '--user', 'try-restart', 'voxtype.service']
+        with (pathlib.Path(os.environ['XDG_RUNTIME_DIR']) / 'restarts').open('a') as stream:
+            stream.write('restart\\n')
+        return None
+    return original_run(command, capture)
+lease.run = staticmethod(run)
+lease.service_pid = lambda self: 123
+namespace['entry']()
+''')
             fake = bins / 'voxtype'
             fake.write_text('''#!/usr/bin/python3
-import os, pathlib, sys
+import json, os, pathlib, re, sys, tomllib
 root = pathlib.Path(os.environ['XDG_RUNTIME_DIR'])
+if sys.argv[1] == '--config':
+    config = pathlib.Path(sys.argv[2])
+    operation = sys.argv[4]
+    text = config.read_text()
+    value = tomllib.loads(text).get('osd', {}).get('enabled')
+    if operation == 'get':
+        print(json.dumps({'key': 'osd.enabled', 'file_value': value, 'value': True if value is None else value}))
+    elif operation == 'set':
+        if '[osd]' not in text: text += '\\n[osd]\\n'
+        text = re.sub(r'^enabled = .*\\n', '', text, flags=re.M)
+        config.write_text(text + 'enabled = ' + sys.argv[6] + '\\n')
+    elif operation == 'unset':
+        config.write_text(re.sub(r'^enabled = .*\\n', '', text, flags=re.M))
+    else: raise RuntimeError(operation)
+    sys.exit(0)
 action = sys.argv[2]
 with (root / 'actions').open('a') as log: log.write(action + '\\n')
 (root / 'voxtype/state').write_text({'start': 'recording', 'stop': 'transcribing', 'cancel': 'idle'}[action])
@@ -260,7 +304,7 @@ ShellRoot {
         onTriggered: {
             try {
                 if (++tries > 100) throw new Error("backend lifecycle timeout at step " + step)
-                if (step === 0 && service.connected && service.snapshot.phase === "idle") {
+                if (step === 0 && service.connected && service.snapshot.phase === "idle" && service.snapshot.osd_setup === "ready") {
                     check(service.action("start") === "queued", "start command")
                     step = 1
                 } else if (step === 1 && service.snapshot.phase === "recording") {
@@ -326,6 +370,20 @@ ShellRoot {
             if actions != ['start', 'stop', 'cancel'] or (runtime / 'voxtype/state').read_text() != 'idle':
                 raise RuntimeError('Service destruction did not cancel fake dictation: ' + repr(actions))
             print('Real QML/observer lifecycle: start, stop, processing-toggle suppression and destroy/cancel passed')
+            if args.osd_switch:
+                import tomllib
+                restored = tomllib.loads(voxtype_config.read_text())
+                if restored.get('osd', {}).get('enabled') is not None:
+                    receipt = home / '.local/state/luddite-voice-osd/voxtype-osd.json'
+                    raise RuntimeError('QML destruction did not restore the original unset OSD preference: '
+                        + repr(dict(config=voxtype_config.read_text(),
+                            receipt=receipt.read_text() if receipt.exists() else None,
+                            restarts=(runtime / 'restarts').read_text())))
+                if (runtime / 'restarts').read_text().splitlines() != ['restart', 'restart']:
+                    raise RuntimeError('Expected exactly one simulated restart to switch and one to restore')
+                if (home / '.local/state/luddite-voice-osd/voxtype-osd.json').exists():
+                    raise RuntimeError('Successful QML cleanup left a recovery receipt')
+                print('Real QML destruction restored the original unset preference; service restarts were simulated')
 
 
 if __name__ == '__main__':

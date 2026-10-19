@@ -285,3 +285,43 @@ have not been checked. The plugin leaves Voxtype's OSD preference unchanged;
 if the stock popup is Voxtype's built-in OSD and it remains enabled, both can
 appear, as documented in the README installation steps. An update or reboot
 has not been established as a fix.
+
+
+## October 19, 2026 — automatic selection of the dictation popup (0.1.1)
+
+The duplicate-popup laptop observation exposed an installation gap: enabling a
+replacement popup still required a separate Voxtype configuration change.
+The service now saves the prior `osd.enabled` preference and switches off only
+Voxtype's built-in popup on a standard installation. Configuration changes use
+Voxtype's supported single-key editor. The service waits for an available
+display and idle dictation, validates the systemd daemon command/configuration
+environment, and applies the change with an idle `try-restart`. It never starts
+a stopped daemon or disables Omarchy's shared volume/brightness OSD plugin.
+
+Normal service teardown restores the original value, including removing a key
+that was originally unset. Already-disabled preferences require no changes or
+restart. Later preference changes and edits to other settings are retained.
+A private recovery receipt survives interrupted writes, restarts or cleanup;
+`backend.py --restore-osd` can finish recovery while the plugin is disabled.
+Unsupported/custom setups get a manual-setup notification, with our popup hidden
+until ready. Pending setup does not cancel recordings handled by the stock UI.
+The laptop's post-update/reboot result remains unconfirmed.
+
+The expanded private QML teardown test initially exposed Quickshell's immediate
+termination of its direct Process child on object destruction. The service now
+uses a waiting launcher parent and an observer in a separate session, retaining
+the original pipes so EOF/broken output can finish cancellation and preference
+restoration. See Quickshell's
+[Process implementation](https://github.com/quickshell-mirror/quickshell/blob/master/src/io/process.cpp).
+Forced termination of the observer itself still requires recovery from the
+receipt; immediate cleanup cannot be guaranteed in that case.
+
+Validation: all 71 unit/process/repository checks passed, including crash
+recovery, unset/true/false preferences, busy-state deferral, custom-service
+refusal, later edits and killed-launcher cleanup. The actual QML component
+passed both style checks and service destruction with preference restoration
+on a private compositor; service identity/restart calls were simulated. Separate
+tests used Voxtype 1.1.1's real configuration editor against temporary files and
+verified comments and unrelated edits survived. Host service identification
+was checked read-only; those tests did not restart the host daemon or record
+microphone audio. Python 3.11 is now required for standard-library TOML parsing.

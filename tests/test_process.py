@@ -13,6 +13,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class ObserverProcess(unittest.TestCase):
+    service_mode = False
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory(prefix='voice-osd-process-')
         self.addCleanup(self.temp.cleanup)
@@ -34,14 +36,25 @@ state = {'start': 'recording', 'stop': 'transcribing', 'cancel': 'idle'}[action]
 (root / 'voxtype/state').write_text(state)
 ''')
         fake.chmod(0o755)
-        self.process = subprocess.Popen([sys.executable, '-I', '-B', '-u', str(ROOT / 'backend.py')],
-            env=dict(os.environ, XDG_RUNTIME_DIR=str(self.root), PATH=str(bins) + ':/usr/bin'),
+        config = self.root / 'config/voxtype/config.toml'
+        config.parent.mkdir(parents=True)
+        config.write_text('[osd]\nenabled = false\n')
+        self.environment = dict(os.environ, HOME=str(self.root), XDG_CONFIG_HOME=str(self.root / 'config'),
+            XDG_STATE_HOME=str(self.root / 'persistent'), XDG_RUNTIME_DIR=str(self.root),
+            DBUS_SESSION_BUS_ADDRESS='unix:path=/nonexistent-voice-osd-fixture', PATH=str(bins) + ':/usr/bin')
+        command = [sys.executable, '-I', '-B', '-u', str(ROOT / 'backend.py')]
+        if self.service_mode:
+            command.append('--service')
+        self.process = subprocess.Popen(command,
+            env=self.environment,
             stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         self.addCleanup(self.cleanup_process)
         self.selector = selectors.DefaultSelector()
         self.selector.register(self.process.stdout, selectors.EVENT_READ)
         self.addCleanup(self.selector.close)
         self.pending = b''
+        self.ready('idle', False)
+        self.wait_for(lambda v: v['osd_setup'] == 'ready')
 
     def cleanup_process(self):
         if self.process.poll() is None:
@@ -126,10 +139,32 @@ state = {'start': 'recording', 'stop': 'transcribing', 'cancel': 'idle'}[action]
         self.state.write_text('recording')
         self.ready('recording', True)
         other = subprocess.run([sys.executable, '-I', '-B', str(ROOT / 'backend.py')],
-            env=dict(os.environ, XDG_RUNTIME_DIR=str(self.root)), input=b'', capture_output=True, timeout=3)
+            env=self.environment, input=b'', capture_output=True, timeout=3)
         self.assertEqual(other.returncode, 1)
         self.assertEqual(self.actions(), [])
         self.assertEqual(self.state.read_text(), 'recording')
+
+
+class ServiceObserverProcess(ObserverProcess):
+    """The QML launcher uses a waiting parent to survive Process destruction."""
+    service_mode = True
+
+    def test_killed_launcher_and_closed_pipes_still_cancel(self):
+        self.state.write_text('recording')
+        self.wait_for(lambda v: v['phase'] == 'recording')
+        self.process.kill()
+        self.process.stdin.close()
+        self.process.wait(timeout=3)
+        deadline = time.monotonic() + 3
+        while time.monotonic() < deadline:
+            if self.selector.select(0.1):
+                data = os.read(self.process.stdout.fileno(), 4096)
+                if not data:
+                    break
+        else:
+            self.fail('Observer did not exit after its launcher and input disappeared')
+        self.assertEqual(self.actions(), ['cancel'])
+        self.assertEqual(self.state.read_text(), 'idle')
 
 
 if __name__ == '__main__':

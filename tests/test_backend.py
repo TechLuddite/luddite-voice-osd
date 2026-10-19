@@ -132,6 +132,20 @@ class StateMachine(unittest.TestCase):
         self.assertEqual(self.actions(), [])
         self.assertEqual(self.monitor.error, "display_unavailable")
 
+    def test_pending_osd_setup_refuses_start_and_leaves_stock_recording_alone(self):
+        self.monitor.control_ready = lambda: False
+        self.ready()
+        self.monitor.message({"action": "start"})
+        self.assertEqual(self.monitor.error, "osd_setup_required")
+        self.state("recording")
+        self.monitor.tick()
+        self.now += 2
+        self.monitor.tick()
+        with patch.object(backend.subprocess, "run") as run:
+            self.monitor.close()
+        run.assert_not_called()
+        self.assertEqual(self.actions(), [])
+
     def test_missing_screen_and_stale_heartbeat_refuse_start(self):
         self.ready(available=False)
         self.monitor.message({"action": "start"})

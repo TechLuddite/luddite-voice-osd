@@ -32,14 +32,14 @@ Item {
     Dictation {
         id: display
         snapshot: root.snapshot
-        connected: root.connected
+        connected: root.connected && (!root.backendEnabled || root.snapshot.osd_setup === "ready")
         microphoneMuted: root.microphoneMuted
         onCancelRequested: root.action("cancel")
     }
 
     Process {
         id: observer
-        command: ["/usr/bin/python3", "-I", "-B", "-u", root.backendPath]
+        command: ["/usr/bin/python3", "-I", "-B", "-u", root.backendPath, "--service"]
         stdinEnabled: true
         stdout: SplitParser {
             onRead: data => {

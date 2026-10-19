@@ -29,7 +29,7 @@ Voice command panel.
 
 ## Development preview
 
-Version 0.1.0 is a development preview published as
+Version 0.1.1 is a development preview published as
 [TechLuddite/luddite-voice-osd](https://github.com/TechLuddite/luddite-voice-osd).
 It is not listed in the marketplace. Installation from this repo, ordinary
 dictation and a repeat test with another theme have been confirmed on one
@@ -47,7 +47,7 @@ on a clean desktop with matching Omarchy wallpapers.
 ## Requirements
 
 - Omarchy Quattro with the Quickshell shell and its current `Commons`/`Ui` kit.
-- Python 3.10 or newer; only the standard library is used.
+- Python 3.11 or newer; only the standard library is used.
 - An already configured Voxtype daemon providing `$XDG_RUNTIME_DIR/voxtype/state`
   and `audio.sock`. The protocol is based on Voxtype 1.1.0, with basic desktop
   dictation also tested on 1.1.1; other releases need confirmation. Use the
@@ -80,16 +80,40 @@ The service starts its observer and stays hidden at idle. Existing `voxtype reco
 shortcuts continue to work while the plugin is enabled. Prefer the gated commands
 below for new bindings: they refuse to start when the frontend is unavailable.
 
-If Voxtype's own OSD is enabled, both displays can appear. To select this popup,
-first note your existing `osd.enabled` setting, then while Voxtype is idle:
+Enabling the plugin automatically selects its popup on a standard Omarchy
+Voxtype installation. Once the display is available and Voxtype is idle, it
+saves the previous `osd.enabled` value, sets only that key to `false`, and
+restarts the running `voxtype.service` to apply it. It leaves Omarchy's
+`omarchy.osd` plugin enabled, so volume, brightness and other system overlays
+keep working. If the stock Voxtype popup was already disabled, no configuration
+change or restart is needed.
+
+The previous value is restored when our service unloads, including normal
+disable/removal and shell reloads. If it was originally unset, the key is removed
+again. Other Voxtype settings and later user edits are preserved. A private
+recovery receipt lives at
+`${XDG_STATE_HOME:-~/.local/state}/luddite-voice-osd/voxtype-osd.json` while the
+plugin owns the setting. A shell reload can restart the idle Voxtype service
+as ownership changes.
+
+Automatic switching requires Voxtype's `config get/set/unset` commands (tested
+with 1.1.1), the regular user configuration file and the standard systemd user
+service running `voxtype daemon`. Custom service commands, configuration paths
+or linked configuration files require manual setup. If switching fails, a
+desktop notification explains that setup is needed, and our recording popup
+stays hidden to avoid showing both. `status` reports `osd_setup` as `waiting`,
+`ready` or `manual`.
+
+For manual setup, note your existing setting, then while Voxtype is idle:
 
 ```sh
 voxtype config set osd.enabled false
+systemctl --user restart voxtype.service
 ```
 
-Apply the configuration using your Voxtype installation's usual reload/restart
-procedure while idle. The plugin does not do this automatically. Keep your
-existing recording source, model, output and notification preferences. A previous
+For older releases without the config command, set `[osd] enabled = false` in
+`~/.config/voxtype/config.toml` and apply it using your installation's usual
+restart procedure while idle. The plugin rechecks for this manual fix. A previous
 Portal installation has its own `voxtype-osd` shim and managed files: migrate it
 separately using its recovery record, rather than enabling two frontends.
 
@@ -124,6 +148,8 @@ service without opening a capture stream or changing audio settings.
 
 The UI and observer exchange bounded metadata and whitelisted actions over
 private process pipes. A single runtime lock prevents duplicate observers.
+The service launcher uses a waiting parent so Quickshell's immediate child
+termination on QML destruction leaves the observer time to finish cleanup.
 Socket peers must belong to the same user. If the frontend stops responding or
 the active window disappears, the observer asks Voxtype to cancel. Closing the
 observer's input or terminating it also cancels unfinished dictation. Cancellation
@@ -139,9 +165,24 @@ omarchy plugin disable io.github.techluddite.voice-osd
 omarchy plugin remove io.github.techluddite.voice-osd
 ```
 
-Restore the previous Voxtype `osd.enabled` value if you changed it. Replace any
-bindings you explicitly routed here with their previous commands. Existing models,
-Voxtype config and output preferences belong to Voxtype and are retained.
+The automatic setup restores only the preference it changed. If you selected
+the popup manually, restore your previous `osd.enabled` value yourself. Replace
+any bindings you explicitly routed here with their previous commands. Existing
+models, Voxtype config and output preferences are retained.
+
+If shutdown or restoration was interrupted, the recovery receipt remains. With
+the plugin disabled and Voxtype idle, finish restoration before removing it:
+
+```sh
+python3 -I -B ~/.config/omarchy/plugins/io.github.techluddite.voice-osd/backend.py --restore-osd
+```
+
+If already removed, run the same command using `backend.py` from a checkout of
+this repository. It refuses to run while another observer holds the runtime
+lock. A stopped Voxtype service stays stopped. If a busy/custom service prevents
+the restart, the restored preference stays on disk and the receipt is retained
+until recovery can finish. Forced termination cannot guarantee immediate
+restoration; it does not discard the saved preference.
 
 ## Development
 
@@ -149,6 +190,7 @@ Voxtype config and output preferences belong to Voxtype and are retained.
 python3 -B -m unittest discover -s tests -v
 python3 -B tests/qml_smoke.py
 python3 -B tests/qml_smoke.py --backend
+python3 -B tests/qml_smoke.py --backend --osd-switch
 python3 -B tests/qml_smoke.py --active-theme --output-scale 1.5 --output-width 640
 ```
 
@@ -160,7 +202,9 @@ It launches a private headless Sway compositor with no hardware input/output
 backend. Sway must be installed, or supplied with `--compositor`; an extracted
 build can also use `--compositor-library-path`. The `--backend` variant runs the
 real observer against a fake Voxtype executable and verifies cleanup on service
-destruction. `--active-theme` copies the current theme, shell text-size overrides
+destruction. `--osd-switch` also checks preference restoration on actual QML
+destruction, with service identity and restarts simulated in the private fixture.
+`--active-theme` copies the current theme, shell text-size overrides
 and fontconfig into the private HOME. `--output-scale` and `--output-width` exercise display
 scaling and narrow logical outputs. The synthetic fixture loads the installed
 system volume OSD as its comparison and checks live fonts, spacing and borders.
