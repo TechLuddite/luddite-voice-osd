@@ -67,8 +67,9 @@ jobs:
           EOF
 
   # The marketplace's own Automated Security Baseline, the scan a submission
-  # gets, run against the pushed commit. Fails unless it reports `passed` with
-  # no findings and no review capabilities.
+  # gets, run against the pushed commit. Reject every finding and unexpected
+  # capability. Automatic OSD selection declares service-management scoped to
+  # voxtype.service; preserve its review-required classification in the summary.
   baseline:
     if: github.event_name == 'push'
     needs: test
@@ -93,10 +94,24 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           node --input-type=module -e '
+          import { appendFileSync } from "node:fs";
           import { runSecurityBaseline } from "./scripts/security-baseline-scanner.mjs";
           const r = await runSecurityBaseline(
             `https://github.com/${process.env.GITHUB_REPOSITORY}`, process.env.GITHUB_SHA,
             { token: process.env.GITHUB_TOKEN, requiredPaths: ["manifest.json"] });
           console.log(JSON.stringify({ outcome: r.outcome, findings: r.findings, capabilities: r.capabilities }, null, 2));
-          const clean = r.outcome === "passed" && !(r.findings || []).length && !(r.capabilities || []).length;
-          process.exit(clean ? 0 : 1);'
+          const capabilities = r.capabilities || [];
+          const clean = r.outcome === "passed" && !capabilities.length;
+          const declared = r.outcome === "review-required" && capabilities.length === 1
+            && capabilities[0].id === "service-management"
+            && capabilities[0].evidence?.length > 0
+            && capabilities[0].evidence.every(e => {
+              const units = e.snippet?.match(/[A-Za-z0-9_.@-]+\.(?:service|socket|timer|target)\b/g) || [];
+              return ["README.md", "backend.py"].includes(e.path)
+                && units.length > 0 && units.every(unit => unit === "voxtype.service");
+            });
+          appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+            `## Marketplace baseline\n\nOutcome: **${r.outcome}**\n\n`
+            + (declared ? "Declared capability: service-management for voxtype.service. Marketplace human review is still required; this CI policy does not grant marketplace approval.\n" : "")
+            + `\nFindings: ${(r.findings || []).length}. Unexpected capabilities and all findings fail CI.\n`);
+          process.exit(!(r.findings || []).length && (clean || declared) ? 0 : 1);'

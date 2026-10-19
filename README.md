@@ -215,7 +215,10 @@ for the distinction between those checks and physical dictation acceptance.
 
 GitHub CI follows the other Luddite plugins: unit/repository checks on pushes and
 PRs, then pinned Luddite Scout and marketplace security-baseline scans on main
-pushes. The installed-Omarchy QML fixture is a separate local check. Hosted
+pushes. Automatic Voxtype restart is a declared `service-management` capability;
+the marketplace scanner requires human review for it. CI rejects findings and
+unexpected capabilities while retaining that classification. See
+[the security policy](SECURITY.md). The installed-Omarchy QML fixture is a separate local check. Hosted
 results are available in
 [GitHub Actions](https://github.com/TechLuddite/luddite-voice-osd/actions).
 

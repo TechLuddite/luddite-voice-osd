@@ -325,3 +325,16 @@ tests used Voxtype 1.1.1's real configuration editor against temporary files and
 verified comments and unrelated edits survived. Host service identification
 was checked read-only; those tests did not restart the host daemon or record
 microphone audio. Python 3.11 is now required for standard-library TOML parsing.
+
+Published `a1ccabc` and updated this desktop using the standard plugin updater.
+The installed observer reports idle, connected and `osd_setup: ready`. Its
+already-disabled stock preference required no change: the config hash and
+Voxtype daemon PID remained identical across the update.
+
+Hosted tests and Scout passed for that commit. The marketplace baseline found
+no security findings but correctly returned `review-required` for the new
+`service-management` capability. CI now explicitly accepts only that declared
+capability with Voxtype-scoped evidence in the README/backend, rejecting every
+finding and unexpected capability. The raw classification remains visible in
+logs/summaries and in the submission draft; marketplace human review remains
+required. Scanner pins and rules are unchanged.
