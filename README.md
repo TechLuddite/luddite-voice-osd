@@ -9,6 +9,8 @@ screen's logical width; larger fonts can grow the height to keep content clear.
 Theme spacing, system fonts, display text size and compositor scaling apply
 through the shared shell tokens.
 
+![Luddite Voice OSD recording on a clean Hackerman background](preview.png)
+
 During recording it shows a real input-level meter, elapsed time and a quiet-input
 warning. The recording icon uses the same microphone/microphone-muted glyphs
 as the system OSD. The unmuted icon follows the system popup text color; when
@@ -39,6 +41,13 @@ It is not listed in the marketplace. Installation from this repo, ordinary
 dictation and a repeat test with another theme have been confirmed on one
 Omarchy x86-64 desktop with Voxtype 1.1.1. See
 [development and acceptance](docs/development.md) for the remaining checks.
+
+## Preview and demo
+
+![Animated recording, processing, dismissal and theme changes](docs/media/demo.gif)
+
+The animation shows the real plugin UI with scripted input levels and phases
+on a clean desktop. [More theme examples and media details](docs/media/README.md).
 
 ## Requirements
 

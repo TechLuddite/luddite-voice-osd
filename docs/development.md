@@ -233,3 +233,32 @@ fed Voxtype. The separate
 confirmed behavior, likely explanation, OSD indicator limitation and follow-up
 checks. No audio-routing fix or OSD workaround was applied. The user requested
 that this topic remain tracked separately while the OSD work proceeds.
+
+
+## October 19, 2026 — submission media prepared
+
+Added a root static preview and a looping GIF/WebP, with stills covering
+Hackerman, Catppuccin Latte and Gruvbox. The actual Dictation.qml component was
+captured on a private headless desktop using scripted levels/phases and shared
+16-pixel font tokens. The background is an original theme-colored gradient;
+Infomarchy, the bar and personal applications were not loaded. No live microphone
+capture or audio-routing change was needed for these assets.
+
+A 22-second, 1280-by-720, 25-fps H.264 video and an 800-by-360 closer crop are in
+`~/Videos/Luddite-Voice-OSD/`, alongside animation exports. Full/cropped PNGs are
+in `~/Pictures/Luddite-Voice-OSD/`. See [media details](media/README.md). Ignored
+`.work/media/` retains the capture script, source logs, asset manifest and a local
+`review.html` gallery. Each shipped image is below the existing 512 KiB limit.
+All 12 repository checks and documentation link checks pass.
+
+Jeans Instability's root preview and local Videos/Jeans-Instability GIF/MP4 were
+reviewed as the presentation reference. A search for “jeans” across the available
+Claude Code, Codex, Pi and OpenCode histories did not locate the original capture
+conversation; its unrecorded choices are not assumed to have been recovered.
+
+Prepared the marketplace title/body in ignored `.work/submission/` using the
+marketplace's submission guide, Productivity category and ai/quickshell/hyprland
+tags. The proposed plugin ID is absent from the current registry, and no duplicate
+submission issue was found. The draft discloses scripted demonstration media and
+the separate mute limitation. The user requested preparation; no marketplace
+issue or release was created.
